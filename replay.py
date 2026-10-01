@@ -31,7 +31,7 @@ fcntl.ioctl(
 )
 
 process = subprocess.Popen(
-    ["./code"],
+    ["./code","input.txt"],
     stdin=slave,
     stdout=slave,
     stderr=slave,
