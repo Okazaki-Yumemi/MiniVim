@@ -146,9 +146,17 @@ void Buffer::WriteTo(const std::filesystem::path& path) const {
         throw std::runtime_error("file can't be open");
     }
     for(size_t i = 0 ; i < lines_.size() - 1; i++){
-        fout << lines_[i] << "\n";
+        if(lines_[i].empty()){
+            fout << ";\n";
+        }else{
+            fout<< lines_[i]<<"\n";
+        }
     }
-    fout<< lines_[lines_.size()-1];
+    if(lines_[lines_.size()-1].empty()){
+        fout<<";";
+    }else{
+        fout<< lines_[lines_.size()-1];
+    }
     
 }
 

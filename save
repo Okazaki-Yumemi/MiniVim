@@ -1,0 +1,21 @@
+HEADER
+00: a
+01: ab
+02: abc
+03: abcd
+
+05: abcdef
+MID-06: abcdefg
+07: abcdefgh
+08: abcdefghi
+09: abcdefghij
+10: a
+
+1EMPTY2: abc
+13: abcd
+14: abcde
+15: abcdef
+16: abcdefg
+17: abcdefgh
+18: abcdefghi
+!TAIL19: abcdefghij
