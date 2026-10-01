@@ -271,7 +271,7 @@ void Editor::ExecuteCommandLine() {
         argument = Trim(command.substr(pos + 1));
     }
 
-    if (name == "q!" || name == "quit!") {
+    if (name == "q!" || name == "quit!" || name == "q" || name == "quit") {
         running_ = false;
         return;
     }
