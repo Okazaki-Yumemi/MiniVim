@@ -145,6 +145,12 @@ void Buffer::WriteTo(const std::filesystem::path& path) const {
     if(!fout){
         throw std::runtime_error("file can't be open");
     }
+
+    // 当只输入一行并且空的时候不需要存 ";\n"
+    if (lines_.size() == 1 && lines_.front().empty()) {
+        return;
+    }
+
     for(size_t i = 0 ; i < lines_.size() - 1; i++){
         if(lines_[i].empty()){
             fout << ";\n";
