@@ -153,9 +153,9 @@ void Buffer::WriteTo(const std::filesystem::path& path) const {
         }
     }
     if(lines_[lines_.size()-1].empty()){
-        fout<<";";
+        fout<<";\n";
     }else{
-        fout<< lines_[lines_.size()-1];
+        fout<< lines_[lines_.size()-1]<<"\n";
     }
     
 }
