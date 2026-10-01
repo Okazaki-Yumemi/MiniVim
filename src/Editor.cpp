@@ -252,19 +252,40 @@ void Editor::ExecuteCommandLine() {
     //2. 空命令直接返回,否则按第一个空格或Tab拆成命令名和参数
     //3. 在Basic部分中你会发现最后命令就一个命令名,直接根据要求的命令名执行
     //4. 无法识别的命令写入message_,供下一次刷新显示
-    std::string trimmed_command = Trim(command_);
+    std::string command = Trim(command_);
     LeaveCommandLine();
 
-    if(trimmed_command.empty()){
+    if (command.empty()) {
         return;
     }
-    if(trimmed_command == "q!"){
-        running_ = false;
+
+    size_t pos = command.find_first_of(" \t");
+
+    std::string name;
+    std::string argument;
+
+    if (pos == std::string::npos) {
+        name = command;
+    } else {
+        name = command.substr(0, pos);
+        argument = Trim(command.substr(pos + 1));
     }
-    if(trimmed_command == "wq"){
-        if(SaveBuffer()){
+
+    if (name == "q!") {
+        running_ = false;
+        return;
+    }
+
+    if (name == "wq") {
+        std::filesystem::path path =
+            argument.empty()
+                ? std::filesystem::path{}
+                : std::filesystem::path(argument);
+
+        if (SaveBuffer(path)) {
             running_ = false;
         }
+        return;
     }
 }
 
