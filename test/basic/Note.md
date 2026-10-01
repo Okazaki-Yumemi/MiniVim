@@ -16,4 +16,3 @@ diff <(vtemu mvim <test.in 2>/dev/null) test.ans
 ```bash
 diff save test.save.ans
 ```
-
