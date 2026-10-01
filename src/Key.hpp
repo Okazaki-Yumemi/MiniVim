@@ -36,17 +36,18 @@ struct KeyEvent {
 
     static constexpr KeyEvent Character(char value) noexcept {
        //工厂函数,从Char生成一个KeyEvent
-       return {};
+       return {KeyCode::Character,value};
     }
 
     constexpr bool IsCharacter(char expected) const noexcept {
         //判断当前KeyEvent是不是expected
-        return false;
+        
+        return (code_ == KeyCode::Character && value_ == expected);
     }
 
     constexpr bool IsControl(char expected) const noexcept {
         //判断当前KeyEvent是不是Ctrl-expected
-        return false;
+        return (code_ == KeyCode::Character && value_ == ControlKey(expected));
     }
 };
 
