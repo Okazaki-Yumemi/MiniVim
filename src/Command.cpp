@@ -5,7 +5,7 @@ namespace sjtu {
 EditorAction NormalModeParser::Feed(KeyEvent key) {
     //根据传入的key生成Action,在Basic部分中你应该直接调用GenerateMotion
     if (key.code_ == KeyCode::Escape) {
-        return {};
+        return {ActionKind::None};
     }
 
 
@@ -13,6 +13,21 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
         auto value = key.value_;
         switch (value) {
         //你需要填写这里
+        case 'h':
+            return GenerateMotion(Motion::Left);
+        case 'j':
+            return GenerateMotion(Motion::Down);
+        case 'k':
+            return GenerateMotion(Motion::Up);
+        case 'l':
+            return GenerateMotion(Motion::Right);
+        case 'i':
+            return GenerateCommand(ActionKind::InsertBefore);
+        case 'a':
+            return GenerateCommand(ActionKind::InsertAfter);
+        case ':':
+            return GenerateCommand(ActionKind::EnterCommandLine);
+        
         default:
             break;
         }
