@@ -38,6 +38,7 @@ private:
     void MoveToFirstRowgg(const Buffer& buffer);
     std::string Classify(char ch, bool mode);
     Position NextStart(const Buffer& Buffer,bool mode);
+    void OpWw(const Buffer& buffer,bool mode);
 
     Position cursor_{}; //Buffer中的光标位置
     Viewport viewport_{}; //正文可见区域及其滚动偏移

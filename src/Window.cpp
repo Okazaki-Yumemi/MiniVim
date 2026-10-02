@@ -38,9 +38,9 @@ void Window::ApplyMotion(const Buffer& buffer, Motion motion) {
     }else if(motion == Motion:: MoveToFirstRowgg){
         MoveToFirstRowgg(buffer);
     }else if(motion == Motion:: Move_w){
-        cursor_ = NextStart(buffer,true);
+        OpWw(buffer,true);
     }else if(motion == Motion:: Move_W){
-        cursor_ = NextStart(buffer,false);
+        OpWw(buffer,false);
     }
 
     cursor_.row_ = cursor_.row_ > buffer.GetLineCount() - 1? buffer.GetLineCount() - 1: cursor_.row_;
@@ -265,6 +265,12 @@ std::string Window::Classify(char ch , bool mode){
     }
 }
 
+void Window::OpWw(const Buffer& buffer,bool mode){
+    cursor_ = NextStart(buffer,mode);
+    desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+}
+
+
 
 // 先写一个试试手
 // 只找位置不修改
@@ -289,30 +295,19 @@ Position Window::NextStart(const Buffer& buffer,bool mode){
     while (row < buffer.GetLineCount()){
         std::string s = buffer.GetLineAt(row);
         while (pos + 1 < s.size()){ // 后面还有字符
-            if(changed_row){
-                if(Classify(s[pos],mode) != initial_state){
-                    //第一个就是
+            
+            if(Classify(s[pos + 1], mode) != initial_state){
+                //找到
+                if(Classify(s[pos + 1], mode) != "Blank"){
+                    col = pos + 1;
                     return {row,col};
                 }else{
-                    //第一个不是
-                    changed_row = false;
-                    //state不用改。反正换了行就是false
-                    //fallback到else让他自己扫就行了
+                    //把状态切换为blank，去扫下一个word
+                    initial_state = "Blank";
                 }
+                
             }else{
-                if(Classify(s[pos + 1], mode) != initial_state){
-                    //找到
-                    if(Classify(s[pos + 1], mode) != "Blank"){
-                        col = pos + 1;
-                        return {row,col};
-                    }else{
-                        //把状态切换为blank，去扫下一个word
-                        initial_state = "Blank";
-                    }
-                    
-                }else{
-                    pos ++;
-                }
+                pos ++;
             }
             
         }
@@ -323,6 +318,8 @@ Position Window::NextStart(const Buffer& buffer,bool mode){
         row ++ ;
         changed_row = true;
         initial_state = "Blank";
+        
+        
 
         //如果是没字符的(empty, not blank)
         if(row < buffer.GetLineCount() && buffer.GetLineAt(row).size() == 0){
@@ -330,6 +327,20 @@ Position Window::NextStart(const Buffer& buffer,bool mode){
             col = pos;
             return {row,col} ;
         }
+
+        if(row < buffer.GetLineCount() &&changed_row){
+            s = buffer.GetLineAt(row);
+                if(Classify(s[pos],mode) != initial_state){
+                    //第一个就是
+                    col = 0;
+                    return {row,col};
+                }else{
+                    //第一个不是
+                    changed_row = false;
+                    //state不用改。反正换了行就是false
+                    //fallback到else让他自己扫就行了
+                }
+            }
     }
 
     //前面都没return，证明完全没找到.
