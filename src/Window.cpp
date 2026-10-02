@@ -171,13 +171,18 @@ void Window::MoveToLineHead(const Buffer& buffer){
     //移动到行首
     // 要修改期望显示列
     cursor_.column_ = 0;
-    desired_column_ = 0;
+    desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_), cursor_.column_);
 }
 
 void Window::MoveToLineEnd(const Buffer& buffer){
     //移动到行尾
     //要修改期望显示列
-    cursor_.column_ = buffer.GetLineAt(cursor_.row_).size() - 1;
+    std::string s = buffer.GetLineAt(cursor_.row_);
+    if(s.size() < 1){
+        cursor_.column_ = 0;
+    }else{
+        cursor_.column_ = buffer.GetLineAt(cursor_.row_).size() - 1;
+    }
     desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
 }
 
