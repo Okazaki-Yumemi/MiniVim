@@ -177,27 +177,27 @@ void Window::MoveToLineHead(const Buffer& buffer){
 void Window::MoveToLineEnd(const Buffer& buffer){
     //移动到行尾
     //要修改期望显示列
-    cursor_.column_ = buffer.GetLineAt(cursor_.row_).size();
-    desired_column_ = cursor_.column_;
+    cursor_.column_ = buffer.GetLineAt(cursor_.row_).size() - 1;
+    desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
 }
 
 void Window::MoveToFirstNoneEmpty(const Buffer& buffer){
     //移动到第一个非空
     std::string s = buffer.GetLineAt(cursor_.row_);
-    size_t right = s.size();
+    size_t right = 0;
 
-    while (right > 0)
+    while (right < s.size())
     {
-        //前移
-        right --;
         //非空
         if(s[right] != '\t' && s[right] != ' '){
             break;
             //right即为下标
         }
+        //后移动，看错题了
+        right ++;
     }
     cursor_.column_ = right;
-    desired_column_ = right;
+    desired_column_ = BufferColumnToRenderColumn(s,right);
 }
 
 } // namespace sjtu
