@@ -34,7 +34,8 @@ private:
     void MoveToLineHead(const Buffer& buffer);
     void MoveToLineEnd(const Buffer& buffer);
     void MoveToFirstNoneEmpty(const Buffer& buffer);
-
+    void MoveToLastRowG(const Buffer& buffer);
+    void MoveToFirstRowgg(const Buffer& buffer);
 
     Position cursor_{}; //Buffer中的光标位置
     Viewport viewport_{}; //正文可见区域及其滚动偏移

@@ -47,6 +47,8 @@ enum class Motion {
     MoveToLineHead,
     MoveToLineEnd,
     MoveToFirstNoneEmpty,
+    MoveToLastRowG,
+    MoveToFirstRowgg,
 };
 
 } // namespace sjtu

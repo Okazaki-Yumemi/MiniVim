@@ -5,7 +5,22 @@ namespace sjtu {
 EditorAction NormalModeParser::Feed(KeyEvent key) {
     //根据传入的key生成Action,在Basic部分中你应该直接调用GenerateMotion
     if (key.code_ == KeyCode::Escape) {
+        // pending和prefix设置为none
+        pending = false;
+        prefix = "";
         return {ActionKind::None};
+    }
+
+    if(prefix != ""){
+        std::string cmd = prefix + key.value_;
+
+        if(cmd == "gg"){
+            return GenerateMotion(Motion::MoveToFirstRowgg);
+        }else{
+            pending = false;
+            prefix = "";
+            return {};
+        }
     }
 
 
@@ -27,6 +42,12 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
             return GenerateMotion(Motion::MoveToLineEnd);
         case '^':
             return GenerateMotion(Motion::MoveToFirstNoneEmpty);
+        case 'G':
+            return GenerateMotion(Motion::MoveToLastRowG);
+        case 'g':
+            pending = true;
+            prefix = "g";
+            return {};
         case 'i':
             return GenerateCommand(ActionKind::InsertBefore);
         case 'a':

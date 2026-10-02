@@ -33,6 +33,10 @@ void Window::ApplyMotion(const Buffer& buffer, Motion motion) {
         MoveToLineEnd(buffer);
     }else if (motion == Motion::MoveToFirstNoneEmpty){
         MoveToFirstNoneEmpty(buffer);
+    }else if (motion == Motion::MoveToLastRowG){
+        MoveToLastRowG(buffer);
+    }else if(motion == Motion:: MoveToFirstRowgg){
+        MoveToFirstRowgg(buffer);
     }
 
     cursor_.row_ = cursor_.row_ > buffer.GetLineCount() - 1? buffer.GetLineCount() - 1: cursor_.row_;
@@ -191,6 +195,13 @@ void Window::MoveToFirstNoneEmpty(const Buffer& buffer){
     std::string s = buffer.GetLineAt(cursor_.row_);
     size_t right = 0;
 
+    if(s.size() == 0){
+        cursor_.column_ = 0;
+        desired_column_ = BufferColumnToRenderColumn(s,0);
+        return;
+    }
+
+
     while (right < s.size())
     {
         //非空
@@ -201,8 +212,35 @@ void Window::MoveToFirstNoneEmpty(const Buffer& buffer){
         //后移动，看错题了
         right ++;
     }
-    cursor_.column_ = right;
+
+    // 全blank特判 //去你妈的单 =。。。
+    if(right == s.size()){
+        cursor_.column_ = right -1;
+    }else{
+        cursor_.column_ = right;
+    }
     desired_column_ = BufferColumnToRenderColumn(s,right);
 }
+
+void Window::MoveToLastRowG(const Buffer& buffer){
+
+    //特判 /空文件
+    if(buffer.GetLineCount() == 0){
+        cursor_.row_ = 0;
+    }else{
+        cursor_.row_ = buffer.GetLineCount() - 1;
+    }
+
+    //直接用
+    MoveToFirstNoneEmpty(buffer);
+}
+
+void Window::MoveToFirstRowgg(const Buffer& buffer){
+    cursor_.row_ = 0;
+
+    MoveToFirstNoneEmpty(buffer);
+}
+
+
 
 } // namespace sjtu

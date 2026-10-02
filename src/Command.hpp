@@ -6,6 +6,7 @@ Command.hpp
 #define MINIVIM_COMMAND_HPP
 
 #include <optional>
+#include <string>
 
 #include "Key.hpp"
 #include "Types.hpp"
@@ -45,8 +46,14 @@ public:
 private:
 //两个辅助函数,从motion/actionkind直接生成对应editoraction,只对某些简单的情形生效.比如h,我们可以根据motion直接得到editoraction为{ActionKind::Move, Motion::h};
 //这两个接口相当局限,在Advanced中你完全可以不管这两个接口,自己创建更方便的函数来辅助Feed函数
+
+
     EditorAction GenerateMotion(Motion motion);
     EditorAction GenerateCommand(ActionKind kind);
+
+    std::string prefix{""};
+    bool pending{false};
+    
 
 };
 
