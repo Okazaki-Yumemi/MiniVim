@@ -31,6 +31,10 @@ private:
     void MoveRight(const Buffer& buffer, size_t count);
     void MoveUp(const Buffer& buffer, size_t count);
     void MoveDown(const Buffer& buffer, size_t count);
+    void MoveToLineHead(const Buffer& buffer);
+    void MoveToLineEnd(const Buffer& buffer);
+    void MoveToFirstNoneEmpty(const Buffer& buffer);
+
 
     Position cursor_{}; //Buffer中的光标位置
     Viewport viewport_{}; //正文可见区域及其滚动偏移

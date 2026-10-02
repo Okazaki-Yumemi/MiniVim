@@ -21,12 +21,19 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
             return GenerateMotion(Motion::Up);
         case 'l':
             return GenerateMotion(Motion::Right);
+        case '0':
+            return GenerateMotion(Motion::MoveToLineHead);
+        case '$':
+            return GenerateMotion(Motion::MoveToLineEnd);
+        case '^':
+            return GenerateMotion(Motion::MoveToFirstNoneEmpty);
         case 'i':
             return GenerateCommand(ActionKind::InsertBefore);
         case 'a':
             return GenerateCommand(ActionKind::InsertAfter);
         case ':':
             return GenerateCommand(ActionKind::EnterCommandLine);
+
         
         default:
             break;

@@ -27,6 +27,12 @@ void Window::ApplyMotion(const Buffer& buffer, Motion motion) {
         MoveUp(buffer,1);
     }else if(motion == Motion::Down){
         MoveDown(buffer,1);
+    }else if(motion == Motion::MoveToLineHead){
+        MoveToLineHead(buffer);
+    }else if(motion == Motion::MoveToLineEnd){
+        MoveToLineEnd(buffer);
+    }else if (motion == Motion::MoveToFirstNoneEmpty){
+        MoveToFirstNoneEmpty(buffer);
     }
 
     cursor_.row_ = cursor_.row_ > buffer.GetLineCount() - 1? buffer.GetLineCount() - 1: cursor_.row_;
@@ -159,6 +165,39 @@ void Window::MoveDown(const Buffer& buffer, std::size_t count) {
     }
 
     cursor_.column_ = column;
+}
+
+void Window::MoveToLineHead(const Buffer& buffer){
+    //移动到行首
+    // 要修改期望显示列
+    cursor_.column_ = 0;
+    desired_column_ = 0;
+}
+
+void Window::MoveToLineEnd(const Buffer& buffer){
+    //移动到行尾
+    //要修改期望显示列
+    cursor_.column_ = buffer.GetLineAt(cursor_.row_).size();
+    desired_column_ = cursor_.column_;
+}
+
+void Window::MoveToFirstNoneEmpty(const Buffer& buffer){
+    //移动到第一个非空
+    std::string s = buffer.GetLineAt(cursor_.row_);
+    size_t right = s.size();
+
+    while (right > 0)
+    {
+        //前移
+        right --;
+        //非空
+        if(s[right] != '\t' && s[right] != ' '){
+            break;
+            //right即为下标
+        }
+    }
+    cursor_.column_ = right;
+    desired_column_ = right;
 }
 
 } // namespace sjtu
