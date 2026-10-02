@@ -41,6 +41,10 @@ void Window::ApplyMotion(const Buffer& buffer, Motion motion) {
         OpWw(buffer,true);
     }else if(motion == Motion:: Move_W){
         OpWw(buffer,false);
+    }else if(motion == Motion:: Move_e){
+        OpEe(buffer,true);
+    }else if(motion == Motion:: Move_E){
+        OpEe(buffer,false);
     }
 
     cursor_.row_ = cursor_.row_ > buffer.GetLineCount() - 1? buffer.GetLineCount() - 1: cursor_.row_;
@@ -370,5 +374,47 @@ Position Window::NextStart(const Buffer& buffer,bool mode){
         }
     }*/
 }
+
+Position Window::NextEnd(const Buffer& Buffer , bool mode){
+    //我草我突然想到我们先找到下一个单词的词头再给他移动到词尾不就行了
+    Position next_head = NextStart(Buffer,mode);
+
+
+    //现在next_head是下个单词的词头
+    std::string s = Buffer.GetLineAt(next_head.row_);
+    
+    if(s.empty()){
+        //停在的位置是空行
+        //不动
+        return next_head;
+    }else{
+        //停的位置不是空的
+
+        //停在文件尾巴
+        if(next_head.column_ == s.size() - 1){
+            return next_head; // 不动
+        }else{
+            //开始扫描这个单词
+            //不会再发生换行
+            size_t col = next_head.column_;
+            std::string initial_state = Classify(s[col],mode);
+
+            while(col < s.size() && initial_state == Classify(s[col],mode)){
+                col ++; //还一样就继续往下走
+            }
+
+            // 走出来两种情况，第一种就是走到词尾，第二种是出界，无论如何都能用col -1 修复
+            col = col -1;
+            return {next_head.row_ , col};
+        }
+    }
+
+}
+
+void Window::OpEe(const Buffer& buffer,bool mode){
+    cursor_ = NextEnd(buffer , mode);
+    desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+}
+
 
 } // namespace sjtu

@@ -54,6 +54,10 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
             return GenerateMotion(Motion::Move_w);
         case 'W':
             return GenerateMotion(Motion::Move_W);
+        case 'e':
+            return GenerateMotion(Motion::Move_e);
+        case 'E':
+            return GenerateMotion(Motion::Move_E);
         case 'i':
             return GenerateCommand(ActionKind::InsertBefore);
         case 'a':

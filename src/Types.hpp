@@ -51,6 +51,8 @@ enum class Motion {
     MoveToFirstRowgg,
     Move_w,
     Move_W,
+    Move_e,
+    Move_E,
 };
 
 } // namespace sjtu
