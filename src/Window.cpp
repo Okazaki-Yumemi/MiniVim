@@ -385,35 +385,39 @@ Position Window::NextStart(const Buffer& buffer,bool mode){
 
 Position Window::NextEnd(const Buffer& Buffer , bool mode){
     //我草我突然想到我们先找到下一个单词的词头再给他移动到词尾不就行了
-    Position next_head = NextStart(Buffer,mode);
+    //Re: 不行
+    std::string s = Buffer.GetLineAt(cursor_.row_);
+    size_t pos = cursor_.column_;
+    std::string initial_state = Classify(s[pos],mode);
 
+    size_t row, col;
+    row = cursor_.row_;
 
-    //现在next_head是下个单词的词头
-    std::string s = Buffer.GetLineAt(next_head.row_);
-    
-    if(s.empty()){
-        //停在的位置是空行
-        //不动
-        return next_head;
+    if(pos < s.size()-1 && Classify(s[pos + 1],mode) == initial_state){
+        //这个地方的意思就是pos指向的位置是一个普通的中间，走到自己的尾巴就行
+        while(pos < s.size() - 1 && Classify(s[pos + 1], mode) == initial_state){
+            pos ++;
+        }
+        //走完之后，pos要么是词尾，要么是行尾
+        return  {row, pos};
     }else{
-        //停的位置不是空的
+        Position Next_head = NextStart(Buffer, mode);
+        s = Buffer.GetLineAt(Next_head.row_);
 
-        //停在文件尾巴
-        if(next_head.column_ == s.size() - 1){
-            return next_head; // 不动
+        //找到了后面的一个词的词头
+        //现在去找它的尾巴
+        pos = Next_head.column_;
+        initial_state = Classify(s[pos], mode);
+
+        if(pos == 0){
+            //在空行
+            return Next_head;
         }else{
-            //开始扫描这个单词
-            //不会再发生换行
-            size_t col = next_head.column_;
-            std::string initial_state = Classify(s[col],mode);
-
-            while(col < s.size() && initial_state == Classify(s[col],mode)){
-                col ++; //还一样就继续往下走
+            //不在空行
+            while(pos < s.size() - 1 && Classify(s[pos + 1], mode) == initial_state){
+                pos ++;
             }
-
-            // 走出来两种情况，第一种就是走到词尾，第二种是出界，无论如何都能用col -1 修复
-            col = col -1;
-            return {next_head.row_ , col};
+            return {Next_head.row_,pos};
         }
     }
 
@@ -459,10 +463,10 @@ Position Window::PrevStart(const Buffer& Buffer , bool mode){
             return prev_end; //一样的，直接返回
         }else{
             //不在第一个
-            while(pos > 0 && Classify(s[pos],mode) == initial_state){
+            while(pos > 0 && Classify(s[pos - 1],mode) == initial_state){
                 pos --;
             }
-            return {row,pos};
+            return {prev_end.row_,pos};
         }
     }
 }
@@ -540,7 +544,7 @@ Position Window::PrevEnd(const Buffer& Buffer, bool mode){
 }
 
 void Window::OpgegE(const Buffer& Buffer, bool mode){
-    cursor_ = PrevStart(Buffer,  mode);
+    cursor_ = PrevEnd(Buffer,  mode);
 
     desired_column_ = BufferColumnToRenderColumn(Buffer.GetLineAt(cursor_.row_), cursor_.column_);
 }
