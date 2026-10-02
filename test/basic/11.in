@@ -1,8 +1,10 @@
 <X>
-iab<CR>
-<X><P-0;0;1;80><CURP>
-cd
-<X><P-0;0;2;80><CURP>
-<EX>
-<X><P-0;0;2;80><CURP>
+iabc<CR>def0<CR>ghi<EX>k
+<X><P-0;0;3;80><CURP>
+kkk
+<X><P-0;0;3;80><CURP>
+j
+<X><P-0;0;3;80><CURP>
+jjj
+<X><P-0;0;3;80><CURP>
 <E>
