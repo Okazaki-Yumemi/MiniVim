@@ -384,42 +384,70 @@ Position Window::NextStart(const Buffer& buffer,bool mode){
 }
 
 Position Window::NextEnd(const Buffer& Buffer , bool mode){
-    //我草我突然想到我们先找到下一个单词的词头再给他移动到词尾不就行了
-    //Re: 不行
-    std::string s = Buffer.GetLineAt(cursor_.row_);
+    size_t row = cursor_.row_;
     size_t pos = cursor_.column_;
-    std::string initial_state = Classify(s[pos],mode);
 
-    size_t row, col;
-    row = cursor_.row_;
+    std::string s = Buffer.GetLineAt(row);
 
-    if(pos < s.size()-1 && Classify(s[pos + 1],mode) == initial_state){
-        //这个地方的意思就是pos指向的位置是一个普通的中间，走到自己的尾巴就行
-        while(pos < s.size() - 1 && Classify(s[pos + 1], mode) == initial_state){
+    if(s.size() != 0){
+        std::string current_state = Classify(s[pos], mode);
+
+        //如果当前就在一个word里面，那直接去自己的结尾
+        if(current_state != "Blank"){
+            if(pos + 1 < s.size() && Classify(s[pos+1], mode) == current_state){
+                // pos + 1 没有越界， pos+1的状态和自己相同，自己在内部
+                while(pos + 1 < s.size() && Classify(s[pos + 1], mode) == current_state){
+                    pos ++;
+                }
+                return {row,pos};
+            }
+            // pos + 1
+            pos ++;                
+        }
+        
+    }else{
+        //空行
+        row ++;
+        pos  = 0;
+    }
+
+    while(row < Buffer.GetLineCount()){
+        //找下面的
+        s = Buffer.GetLineAt(row);
+
+        if(s.empty()){
+            //还要继续跳
+            row ++;
+            pos = 0;
+            continue;
+        }
+
+        //扫描
+        while(pos < s.size() && Classify(s[pos], mode) == "Blank"){
             pos ++;
         }
-        //走完之后，pos要么是词尾，要么是行尾
-        return  {row, pos};
-    }else{
-        Position Next_head = NextStart(Buffer, mode);
-        s = Buffer.GetLineAt(Next_head.row_);
+        //找到词了
+        if(pos < s.size()){
+            std::string state = Classify(s[pos], mode);
 
-        //找到了后面的一个词的词头
-        //现在去找它的尾巴
-        pos = Next_head.column_;
-        initial_state = Classify(s[pos], mode);
-
-        if(pos == 0){
-            //在空行
-            return Next_head;
-        }else{
-            //不在空行
-            while(pos < s.size() - 1 && Classify(s[pos + 1], mode) == initial_state){
+            while(pos + 1 < s.size() && Classify(s[pos + 1], mode) == state){
                 pos ++;
             }
-            return {Next_head.row_,pos};
+
+            return {row, pos};
         }
+        //没找到
+        row  ++;
+        pos = 0;
     }
+    //没找到
+    row = Buffer.GetLineCount() - 1;
+    s = Buffer.GetLineAt(row);
+
+    if(s.empty()){
+        return {row, 0};
+    }
+    return {row, s.size() -1 };
 
 }
 
@@ -430,45 +458,45 @@ void Window::OpEe(const Buffer& buffer,bool mode){
 
 
 Position Window::PrevStart(const Buffer& Buffer , bool mode){
-    std::string s = Buffer.GetLineAt(cursor_.row_);
+    size_t row = cursor_.row_;
     size_t pos = cursor_.column_;
-    std::string initial_state = Classify(s[pos],mode);
 
-    //先不管空行判断先.
+    std::string s = Buffer.GetLineAt(row);
 
-    size_t row, col;
-    row = cursor_.row_;
+    if(s.size() != 0){
+        std::string current_state = Classify(s[pos], mode);
+        //blank不行
+        if(current_state != "Blank" && pos > 0 && Classify(s[pos-1],mode) == current_state){
+            //现在是在一个词内
 
-    if(pos > 0 && Classify(s[pos - 1],mode) == initial_state){
-        //这个地方的意思是pos指向的位置就是一个普通的中间的地方，找这个地方最前面的字母就行
-        // 无需换行
-        while (pos > 0 && Classify(s[pos - 1],mode) == initial_state )
-        {
-            pos --;
-        }
-        //走完之后，pos要么是0, 要么是词头
-        return {row,pos};
-    }else{
-        //这个地方pos要么是0，要么其已经是词头
-        //先去找前面一个词的词尾。
-        //找前面词尾的代码直接先去写PrevEnd了
-        Position prev_end = PrevEnd(Buffer,mode);
-        s = Buffer.GetLineAt(prev_end.row_);
-        //找到前面一个词尾了
-        pos = prev_end.column_;
-        initial_state = Classify(s[pos],mode);
-
-        if(pos == 0){
-            //是在第一个，证明这个地方是空行
-            return prev_end; //一样的，直接返回
-        }else{
-            //不在第一个
-            while(pos > 0 && Classify(s[pos - 1],mode) == initial_state){
+            while(pos > 0 && Classify(s[pos - 1], mode) == current_state){
                 pos --;
             }
-            return {prev_end.row_,pos};
+
+            return {row , pos};
         }
     }
+
+    //上面找到了词内的情况，那现在我们都要找前一个word了
+    Position prev_end = PrevEnd(Buffer, mode);
+
+    s = Buffer.GetLineAt(prev_end.row_);
+
+    if(s.empty()){
+        //前面的词也是空的
+        return prev_end; // 一样
+    }
+
+    pos = prev_end.column_;
+
+    std::string state = Classify(s[pos], mode);
+    // 从前面的end到head
+    while (pos > 0 && Classify(s[pos - 1],mode) == state)
+    {
+        pos --;
+    }
+    return {prev_end.row_, pos};
+    
 }
 
 
