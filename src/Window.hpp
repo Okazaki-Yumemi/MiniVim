@@ -41,6 +41,10 @@ private:
     void OpWw(const Buffer& buffer,bool mode);
     Position NextEnd(const Buffer& Buffer, bool mode);
     void OpEe(const Buffer& buffer, bool mode);
+    Position PrevStart(const Buffer& Buffer, bool mode);
+    void OpBb(const Buffer& Buffer, bool mode);
+    Position PrevEnd(const Buffer& Buffer, bool mode);
+    void OpgegE(const Buffer& Buffer, bool mode);
 
 
     Position cursor_{}; //Buffer中的光标位置

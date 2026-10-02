@@ -53,6 +53,10 @@ enum class Motion {
     Move_W,
     Move_e,
     Move_E,
+    Move_b,
+    Move_B,
+    Move_ge,
+    Move_gE,
 };
 
 } // namespace sjtu

@@ -45,6 +45,14 @@ void Window::ApplyMotion(const Buffer& buffer, Motion motion) {
         OpEe(buffer,true);
     }else if(motion == Motion:: Move_E){
         OpEe(buffer,false);
+    }else if(motion == Motion :: Move_B){
+        OpBb(buffer,false);
+    }else if(motion == Motion :: Move_b){
+        OpBb(buffer,true);
+    }else if(motion == Motion :: Move_gE){
+        OpgegE(buffer,false);
+    }else if(motion == Motion :: Move_ge){
+        OpgegE(buffer,true);
     }
 
     cursor_.row_ = cursor_.row_ > buffer.GetLineCount() - 1? buffer.GetLineCount() - 1: cursor_.row_;
@@ -414,6 +422,127 @@ Position Window::NextEnd(const Buffer& Buffer , bool mode){
 void Window::OpEe(const Buffer& buffer,bool mode){
     cursor_ = NextEnd(buffer , mode);
     desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+}
+
+
+Position Window::PrevStart(const Buffer& Buffer , bool mode){
+    std::string s = Buffer.GetLineAt(cursor_.row_);
+    size_t pos = cursor_.column_;
+    std::string initial_state = Classify(s[pos],mode);
+
+    //先不管空行判断先.
+
+    size_t row, col;
+    row = cursor_.row_;
+
+    if(pos > 0 && Classify(s[pos - 1],mode) == initial_state){
+        //这个地方的意思是pos指向的位置就是一个普通的中间的地方，找这个地方最前面的字母就行
+        // 无需换行
+        while (pos > 0 && Classify(s[pos - 1],mode) == initial_state )
+        {
+            pos --;
+        }
+        //走完之后，pos要么是0, 要么是词头
+        return {row,pos};
+    }else{
+        //这个地方pos要么是0，要么其已经是词头
+        //先去找前面一个词的词尾。
+        //找前面词尾的代码直接先去写PrevEnd了
+        Position prev_end = PrevEnd(Buffer,mode);
+        s = Buffer.GetLineAt(prev_end.row_);
+        //找到前面一个词尾了
+        pos = prev_end.column_;
+        initial_state = Classify(s[pos],mode);
+
+        if(pos == 0){
+            //是在第一个，证明这个地方是空行
+            return prev_end; //一样的，直接返回
+        }else{
+            //不在第一个
+            while(pos > 0 && Classify(s[pos],mode) == initial_state){
+                pos --;
+            }
+            return {row,pos};
+        }
+    }
+}
+
+
+void Window::OpBb(const Buffer& Buffer, bool mode){
+    cursor_ = PrevStart(Buffer,  mode);
+
+    desired_column_ = BufferColumnToRenderColumn(Buffer.GetLineAt(cursor_.row_), cursor_.column_);
+}
+
+
+Position Window::PrevEnd(const Buffer& Buffer, bool mode){
+    size_t row = cursor_.row_;
+
+    std::string s = Buffer.GetLineAt(row);
+
+    size_t before = 0;
+
+    if(s.size() != 0){
+        //非空
+        size_t pos = cursor_.column_;
+
+        if(Classify(s[pos],mode) == "Blank"){
+            //现在在空白
+            before = pos;
+        } else{
+            //现在在词内
+            std::string current_state = Classify(s[pos],mode);
+
+            while(pos > 0 && Classify(s[pos - 1], mode) == current_state){
+                pos--;
+            }
+
+            before = pos;
+            
+        }
+        //现在pos要么在 0，要么在自己的词头
+        while(before > 0 && Classify(s[before - 1],mode) == "Blank"){
+            //跳过blank
+            before --;
+        }
+
+        if(before > 0){
+            return {row, before - 1};
+        }
+    }
+
+    // 到头了，往前走
+    while(row > 0){
+        row --;
+        //更新
+        s = Buffer.GetLineAt(row);
+
+
+        if(s.empty()){
+            //空的
+            return {row,0};
+        }
+
+        size_t right = s.size();
+
+        while( right > 0 && Classify(s[right -1], mode) == "Blank"){
+            right --;
+        }
+
+        //最后看看right位置
+        if(right > 0){
+            return {row,right -1};
+        }
+        //没找到，fall back
+    }
+    return {0,0}; // 全都没找到
+    
+}
+
+void Window::OpgegE(const Buffer& Buffer, bool mode){
+    cursor_ = PrevStart(Buffer,  mode);
+
+    desired_column_ = BufferColumnToRenderColumn(Buffer.GetLineAt(cursor_.row_), cursor_.column_);
 }
 
 
