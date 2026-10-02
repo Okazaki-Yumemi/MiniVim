@@ -37,6 +37,10 @@ void Window::ApplyMotion(const Buffer& buffer, Motion motion) {
         MoveToLastRowG(buffer);
     }else if(motion == Motion:: MoveToFirstRowgg){
         MoveToFirstRowgg(buffer);
+    }else if(motion == Motion:: Move_w){
+        cursor_ = NextStart(buffer,true);
+    }else if(motion == Motion:: Move_W){
+        cursor_ = NextStart(buffer,false);
     }
 
     cursor_.row_ = cursor_.row_ > buffer.GetLineCount() - 1? buffer.GetLineCount() - 1: cursor_.row_;
@@ -219,7 +223,7 @@ void Window::MoveToFirstNoneEmpty(const Buffer& buffer){
     }else{
         cursor_.column_ = right;
     }
-    desired_column_ = BufferColumnToRenderColumn(s,right);
+    desired_column_ = BufferColumnToRenderColumn(s,cursor_.column_);
 }
 
 void Window::MoveToLastRowG(const Buffer& buffer){
@@ -242,5 +246,118 @@ void Window::MoveToFirstRowgg(const Buffer& buffer){
 }
 
 
+std::string Window::Classify(char ch , bool mode){
+    //mode = true : word
+    if(mode){
+        if(ispunct(ch) && ch != '_'){ //下划线不算
+            return "Punctuation";
+        }else if(isspace(ch)){
+            return "Blank";
+        }else{
+            return "WordChar";
+        }
+    }else{
+        if(isspace(ch)){
+            return "Blank";
+        }else{
+            return "NoneBlank";
+        }
+    }
+}
+
+
+// 先写一个试试手
+// 只找位置不修改
+Position Window::NextStart(const Buffer& buffer,bool mode){
+    std::string s  =  buffer.GetLineAt(cursor_.row_);
+    size_t pos = cursor_.column_;
+    std::string initial_state;
+    bool changed_row = false;
+    if(s.size() == 0){
+        // 如果第一个就是空的，那我们的initial_state就是找一个非blank的就行
+        initial_state = "Blank";
+        changed_row = true;
+    }else{
+        initial_state = Classify(s[pos],mode);
+    } 
+    
+    size_t row,col ;
+    row = cursor_.row_;
+
+    //后面还有
+    //不走出文件
+    while (row < buffer.GetLineCount()){
+        std::string s = buffer.GetLineAt(row);
+        while (pos + 1 < s.size()){ // 后面还有字符
+            if(changed_row){
+                if(Classify(s[pos],mode) != initial_state){
+                    //第一个就是
+                    return {row,col};
+                }else{
+                    //第一个不是
+                    changed_row = false;
+                    //state不用改。反正换了行就是false
+                    //fallback到else让他自己扫就行了
+                }
+            }else{
+                if(Classify(s[pos + 1], mode) != initial_state){
+                    //找到
+                    if(Classify(s[pos + 1], mode) != "Blank"){
+                        col = pos + 1;
+                        return {row,col};
+                    }else{
+                        //把状态切换为blank，去扫下一个word
+                        initial_state = "Blank";
+                    }
+                    
+                }else{
+                    pos ++;
+                }
+            }
+            
+        }
+        // 退出循环，走到头了换行
+        // 换行之后应该重置 initial_state，因为我们换了之后，额，换了之后无论下一个是啥都是新的单词了
+        // 因为空行不算word
+        pos = 0;
+        row ++ ;
+        changed_row = true;
+        initial_state = "Blank";
+
+        //如果是没字符的(empty, not blank)
+        if(row < buffer.GetLineCount() && buffer.GetLineAt(row).size() == 0){
+            // 停在这里
+            col = pos;
+            return {row,col} ;
+        }
+    }
+
+    //前面都没return，证明完全没找到.
+    row = buffer.GetLineCount() - 1;
+    if(buffer.GetLineAt(row).size() == 0){
+        col = 0;
+    }else{
+        col = buffer.GetLineAt(row).size() -1 ;
+    }
+    return {row,col};
+
+    /*if(pos < s.size()){
+        //后面一个和当前这个一样，证明是同一个块
+        if(current_state == Classify(s[pos],mode)){
+            while(pos + 1 < s.size() && Classify(s[pos],mode) == Classify(s[pos+1],mode)){
+                //当下一个和现在这个一样，没走到头，继续往下走
+                pos++;
+            }
+            //走完了，看情况
+            if(pos + 1 == s.size()){
+                //走到头也没找到
+                // 那就是下一行的第一个
+            }else{
+                //找到了
+                col = pos + 1;
+            }
+        }
+    }*/
+}
 
 } // namespace sjtu

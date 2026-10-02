@@ -15,6 +15,8 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
         std::string cmd = prefix + key.value_;
 
         if(cmd == "gg"){
+            prefix = false;
+            prefix = "";
             return GenerateMotion(Motion::MoveToFirstRowgg);
         }else{
             pending = false;
@@ -48,6 +50,10 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
             pending = true;
             prefix = "g";
             return {};
+        case 'w':
+            return GenerateMotion(Motion::Move_w);
+        case 'W':
+            return GenerateMotion(Motion::Move_W);
         case 'i':
             return GenerateCommand(ActionKind::InsertBefore);
         case 'a':
