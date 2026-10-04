@@ -41,8 +41,18 @@ const std::string& Buffer::GetLineAt(std::size_t row) const {
     return lines_[row];
 }
 
-std::string& Buffer::GetLineAt_Changeable(std::size_t row){
-    return lines_[row];
+
+void Buffer::ReplaceCharacter(size_t row, size_t col, char ch){
+    if(row >= lines_.size()){
+        return;
+    }
+
+    if(col >= lines_[row].size()){
+        return;
+    }
+
+    lines_[row][col] = ch;
+    modified_ = true;
 }
 
 

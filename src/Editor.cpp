@@ -355,7 +355,7 @@ void Editor::ChangeCase(){
     //把当前字符的大小写改变，change Case
     Position cursor = window_.GetCursor();
 
-    std::string& s = buffer_.GetLineAt_Changeable(cursor.row_);
+    std::string s = buffer_.GetLineAt(cursor.row_);
 
     //normal mode下cursor不会在行尾
     if(s.size() == 0){
@@ -366,16 +366,16 @@ void Editor::ChangeCase(){
     if(cursor.column_ == s.size() -1){
         //最后一个
         if(s[cursor.column_] >= 'A' && s[cursor.column_] <='Z'){
-            s[cursor.column_] = s[cursor.column_] - 'A' + 'a';
+            buffer_.ReplaceCharacter(cursor.row_,cursor.column_,s[cursor.column_] - 'A' + 'a');
         }else if(s[cursor.column_] >= 'a' && s[cursor.column_] <= 'z'){
-            s[cursor.column_] = s[cursor.column_] - 'a' + 'A';
+            buffer_.ReplaceCharacter(cursor.row_,cursor.column_,s[cursor.column_] - 'a' + 'A');
         }
     }else{
         //不是最后一个
         if(s[cursor.column_] >= 'A' && s[cursor.column_] <='Z'){
-            s[cursor.column_] = s[cursor.column_] - 'A' + 'a';
+            buffer_.ReplaceCharacter(cursor.row_,cursor.column_,s[cursor.column_] - 'A' + 'a');
         }else if(s[cursor.column_] >= 'a' && s[cursor.column_] <= 'z'){
-            s[cursor.column_] = s[cursor.column_] - 'a' + 'A';
+            buffer_.ReplaceCharacter(cursor.row_,cursor.column_,s[cursor.column_] - 'a' + 'A');
         }
         cursor.column_ ++; //右移
     }
