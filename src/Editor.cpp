@@ -212,6 +212,29 @@ void Editor::HandleInsert(KeyEvent key) {
         return;
 
     }
+
+    if(key.code_ == KeyCode::Delete){
+        Position cursor = window_.GetCursor();
+
+        std::string s = buffer_.GetLineAt(cursor.row_);
+
+        // cursor在行尾
+        if(cursor.column_ == s.size()){
+            // row不是最后一行
+            if(cursor.row_ != buffer_.GetLineCount() -1){
+                //合并
+                buffer_.JoinLine(cursor.row_);
+            }
+            //是最后一行，则什么都不做
+        }else{
+            //不在行尾，直接删除
+            buffer_.EraseCharacter(cursor.row_, cursor.column_ );
+        }
+        window_.SetCursor(buffer_,cursor,true);
+        return;
+    }
+
+
     if(key.code_ == KeyCode::Character &&  (IsPrintable(key.value_) || key.value_ == '\t')){
         Position cursor = window_.GetCursor();
         buffer_.InsertCharacter(cursor.row_,cursor.column_, key.value_);
