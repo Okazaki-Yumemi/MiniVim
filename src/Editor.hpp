@@ -45,6 +45,8 @@ private:
     void EnterFirstNoneEmptyInsert();
     void EnterLastWordInsert();
     void LeaveInsert();
+    void OpenBelow();
+    void OpenAbove();
     void HandleInsert(KeyEvent key);
 
     //ProcessKey的下属函数之一,Editor在CommandMode下对于KeyEvent的处理逻辑

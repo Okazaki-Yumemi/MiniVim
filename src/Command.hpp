@@ -25,6 +25,8 @@ enum class ActionKind {
     //在Advanced部分中你很可能需要添加别的ActionKind
     InsertFirstNoneBlank,
     AppendLineEnd,
+    OpenBelow,
+    OpenAbove,
 };
 
 //EditorAction是在NormalMode下我们的Editor真正收到的指令,在Editor中会根据传入的Action的不同让各模块做出对应的处理

@@ -161,6 +161,14 @@ void Editor::Execute(const EditorAction& action) {
     case ActionKind::AppendLineEnd:{
         EnterLastWordInsert();
         return;
+        }
+    case ActionKind::OpenBelow:{
+        OpenBelow();
+        return;
+    }
+    case ActionKind::OpenAbove:{
+        OpenAbove();
+        return;
     }
     }
 
@@ -223,9 +231,19 @@ void Editor::EnterInsert(Position position) {
 
 void Editor::EnterFirstNoneEmptyInsert(){
     //切换到First Insert 模式
-    window_.ApplyMotion(buffer_,Motion::MoveToFirstNoneEmpty);
-    EnterInsert(window_.GetCursor());
-    return;
+    Position cursor = window_.GetCursor();
+    const std::string s = buffer_.GetLineAt(cursor.row_);
+
+    size_t pos = 0;
+    while(pos < s.size() && (s[pos] == ' ' || s[pos] == '\t')){
+        pos ++;
+    }
+
+    //普通行停在第一个非空
+    //全空留在行尾
+    cursor.column_ = pos;
+    
+    EnterInsert(cursor);
 }
 
 void Editor::EnterLastWordInsert(){
@@ -242,6 +260,31 @@ void Editor::EnterLastWordInsert(){
     return;
 }
 
+void Editor::OpenBelow(){
+    //移动到行尾,split
+    Position cursor = window_.GetCursor();
+    
+    size_t end = buffer_.GetLineAt(cursor.row_).size();
+
+    buffer_.SplitLine(cursor.row_,end);
+
+    cursor.column_ = 0;
+    cursor.row_ ++;
+    EnterInsert(cursor);
+    return;
+}
+
+void Editor::OpenAbove(){
+    //移动到行首，split
+    Position cursor = window_.GetCursor();
+
+    buffer_.SplitLine(cursor.row_,0);
+
+    cursor.column_ = 0;
+
+    EnterInsert(cursor);
+    return;
+}
 
 
 void Editor::LeaveInsert() {

@@ -80,7 +80,10 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
             return GenerateCommand(ActionKind::InsertFirstNoneBlank);
         case 'A':
             return GenerateCommand(ActionKind::AppendLineEnd);
-
+        case 'O':
+            return GenerateCommand(ActionKind::OpenAbove);
+        case 'o':
+            return GenerateCommand(ActionKind::OpenBelow);
         
         default:
             break;
