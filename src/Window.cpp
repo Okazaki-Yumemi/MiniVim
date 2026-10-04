@@ -121,10 +121,10 @@ void Window::ApplyMotion(const Buffer& buffer, Motion motion,size_t count , bool
     }else{
         cursor_.column_ = cursor_.column_ > buffer.GetLineAt(cursor_.row_).size() - 1? buffer.GetLineAt(cursor_.row_).size() - 1:cursor_.column_;
     }
-    EnsureCursorVisible(buffer);
+    EnsureCursorVisible(buffer,true);
 }
 
-void Window::EnsureCursorVisible(const Buffer& buffer) {
+void Window::EnsureCursorVisible(const Buffer& buffer,bool normal_cursor) {
     //1. 光标高于或低于可见区域时,调整top_,使光标刚好进入区域
     //2. 把光标的字符下标换算成显示列,再用相同思路调整left_
     
@@ -135,7 +135,16 @@ void Window::EnsureCursorVisible(const Buffer& buffer) {
         viewport_.top_ = cursor_.row_ - viewport_.rows_ + 1;
     }
 
-    size_t render_column =  BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+    const std::string& s = buffer.GetLineAt(cursor_.row_);
+    size_t render_column;
+
+    if(normal_cursor){
+        render_column =
+            BufferColumnToNormalCursorColumn(s,cursor_.column_);
+    }else{
+        render_column =
+            BufferColumnToRenderColumn(s,cursor_.column_);
+    }
 
     if(render_column < viewport_.left_){
         viewport_.left_ = render_column;
@@ -182,7 +191,7 @@ void Window::SetCursor(const Buffer& buffer, Position position, bool allow_line_
     
 
 
-    EnsureCursorVisible(buffer);
+    EnsureCursorVisible(buffer, !allow_line_end);
 
 }
 
@@ -311,7 +320,7 @@ void Window::MoveToFirstNoneEmpty(const Buffer& buffer){
     }else{
         cursor_.column_ = right;
     }
-    desired_column_ = BufferColumnToRenderColumn(s,cursor_.column_);
+    desired_column_ = BufferColumnToNormalCursorColumn(s,cursor_.column_);
 }
 
 void Window::MoveToLastRowG(const Buffer& buffer,size_t count , bool has_count){

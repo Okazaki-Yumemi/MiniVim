@@ -76,7 +76,7 @@ void Editor::RefreshScreen() {
     ScreenSize terminal_size = terminal_.GetScreenSize();
 
     window_.Resize(terminal_size);
-    window_.EnsureCursorVisible(buffer_);
+    window_.EnsureCursorVisible(buffer_ , mode_ != Mode::Insert);
     // 2
 
     RenderState renderState = {mode_,command_,message_};

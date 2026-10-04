@@ -19,7 +19,7 @@ public:
 
     void ApplyMotion(const Buffer& buffer, Motion motion,size_t count = 1 , bool has_count = false);
 
-    void EnsureCursorVisible(const Buffer& buffer);
+    void EnsureCursorVisible(const Buffer& buffer,bool normal_cursor = true);
 
     //allow_line_end为true时允许停在最后一个字符之后,供插入模式使用
     void SetCursor(const Buffer& buffer, Position position, bool allow_line_end);
