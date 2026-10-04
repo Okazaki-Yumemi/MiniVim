@@ -48,10 +48,10 @@ private:
     void OpenBelow();
     void OpenAbove();
 
-    void DeleteCurrChar();
-    void DeleteBeforeChar();
+    void DeleteCurrChar(size_t count = 1);
+    void DeleteBeforeChar(size_t count = 1);
 
-    void ChangeCase();
+    void ChangeCase(size_t count);
 
     void HandleInsert(KeyEvent key);
 

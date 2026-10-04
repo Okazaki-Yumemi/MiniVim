@@ -172,16 +172,16 @@ void Editor::Execute(const EditorAction& action) {
     }
 
     case ActionKind::DeleteBeforeChar:{
-        DeleteBeforeChar();
+        DeleteBeforeChar(action.count_);
         return;
     }
     case ActionKind::DeleteCurrChar:{
-        DeleteCurrChar();
+        DeleteCurrChar(action.count_);
         return;
     }
 
     case ActionKind::ChangeCase:{
-        ChangeCase();
+        ChangeCase(action.count_);
         return;
     }
     }
@@ -323,7 +323,7 @@ void Editor::OpenAbove(){
     return;
 }
 
-void Editor::DeleteCurrChar(){
+void Editor::DeleteCurrChar(size_t count){
     //照搬Del的逻辑。。
     Position cursor = window_.GetCursor();
 
@@ -332,26 +332,33 @@ void Editor::DeleteCurrChar(){
     if(s.size() == 0){
         return; // Normal mode下 cursor不会跑到 size位置，所以如果是空行直接退
     }
-    buffer_.EraseCharacter(cursor.row_,cursor.column_);
-
+    size_t available = s.size() - cursor.column_;
+    size_t actual = std::min(count,available);
+    for(size_t i = 0 ; i < actual ; i++){
+        buffer_.EraseCharacter(cursor.row_,cursor.column_);
+    }
     window_.SetCursor(buffer_, cursor, false);
     return;
 }
 
-void Editor::DeleteBeforeChar(){
+void Editor::DeleteBeforeChar(size_t count){
     //照搬Backspace逻辑
     Position cursor = window_.GetCursor();
     if(cursor.column_ == 0){
         return;
     }else{
-        buffer_.EraseCharacter(cursor.row_,cursor.column_ - 1);
+        size_t actual = std::min(cursor.column_,count);
+        for(size_t i = 0 ; i < actual ; i++){
+            --cursor.column_;
+            buffer_.EraseCharacter(cursor.row_,cursor.column_);
+        }
         cursor.column_ --;
     }
     window_.SetCursor(buffer_,cursor,false);
     return;
 }
 
-void Editor::ChangeCase(){
+void Editor::ChangeCase(size_t count){
     //把当前字符的大小写改变，change Case
     Position cursor = window_.GetCursor();
 
@@ -363,22 +370,18 @@ void Editor::ChangeCase(){
         //啥都不干
     }
 
-    if(cursor.column_ == s.size() -1){
-        //最后一个
-        if(s[cursor.column_] >= 'A' && s[cursor.column_] <='Z'){
-            buffer_.ReplaceCharacter(cursor.row_,cursor.column_,s[cursor.column_] - 'A' + 'a');
-        }else if(s[cursor.column_] >= 'a' && s[cursor.column_] <= 'z'){
-            buffer_.ReplaceCharacter(cursor.row_,cursor.column_,s[cursor.column_] - 'a' + 'A');
+    size_t remaining = s.size() - cursor.column_;
+    size_t actual = std::min(remaining,count);
+
+    for(size_t i = 0; i < actual ; i++){
+        if(s[cursor.column_ + i] >= 'A' && s[cursor.column_ + i] <='Z'){
+            buffer_.ReplaceCharacter(cursor.row_,cursor.column_ + i,s[cursor.column_ + i] - 'A' + 'a');
+        }else if(s[cursor.column_ + i] >= 'a' && s[cursor.column_ + i] <= 'z'){
+            buffer_.ReplaceCharacter(cursor.row_,cursor.column_ + i,s[cursor.column_ + i] - 'a' + 'A');
         }
-    }else{
-        //不是最后一个
-        if(s[cursor.column_] >= 'A' && s[cursor.column_] <='Z'){
-            buffer_.ReplaceCharacter(cursor.row_,cursor.column_,s[cursor.column_] - 'A' + 'a');
-        }else if(s[cursor.column_] >= 'a' && s[cursor.column_] <= 'z'){
-            buffer_.ReplaceCharacter(cursor.row_,cursor.column_,s[cursor.column_] - 'a' + 'A');
-        }
-        cursor.column_ ++; //右移
     }
+    
+    cursor.column_ += actual ;
 
     window_.SetCursor(buffer_,cursor,false);
 }

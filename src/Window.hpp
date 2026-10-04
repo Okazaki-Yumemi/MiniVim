@@ -32,7 +32,7 @@ private:
     void MoveUp(const Buffer& buffer, size_t count);
     void MoveDown(const Buffer& buffer, size_t count);
     void MoveToLineHead(const Buffer& buffer);
-    void MoveToLineEnd(const Buffer& buffer);
+    void MoveToLineEnd(const Buffer& buffer,size_t count = 1);
     void MoveToFirstNoneEmpty(const Buffer& buffer);
     void MoveToLastRowG(const Buffer& buffer, size_t count = 1 , bool has_count = false);
     void MoveToFirstRowgg(const Buffer& buffer,size_t count=1, bool has_count= false);
@@ -50,6 +50,7 @@ private:
     Position cursor_{}; //Buffer中的光标位置
     Viewport viewport_{}; //正文可见区域及其滚动偏移
     size_t desired_column_{0}; //上下移动时希望保持的显示列,经过短行时也保留这个目标
+    bool desired_eol_{false};
 };
 
 } // namespace sjtu
