@@ -188,11 +188,9 @@ void Window::SetCursor(const Buffer& buffer, Position position, bool allow_line_
     }else{
         desired_column_ = BufferColumnToNormalCursorColumn(buffer.GetLineAt(cursor_.row_), cursor_.column_);
     }
-    
-
+    desired_eol_ = false;
 
     EnsureCursorVisible(buffer, !allow_line_end);
-
 }
 
 
@@ -342,6 +340,7 @@ void Window::MoveToFirstNoneEmpty(const Buffer& buffer){
     if(s.size() == 0){
         cursor_.column_ = 0;
         desired_column_ = BufferColumnToNormalCursorColumn(s,0);
+        desired_eol_ = false;
         return;
     }
 

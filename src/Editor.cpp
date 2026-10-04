@@ -352,7 +352,6 @@ void Editor::DeleteBeforeChar(size_t count){
             --cursor.column_;
             buffer_.EraseCharacter(cursor.row_,cursor.column_);
         }
-        cursor.column_ --;
     }
     window_.SetCursor(buffer_,cursor,false);
     return;
