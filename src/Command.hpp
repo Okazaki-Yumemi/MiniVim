@@ -41,6 +41,9 @@ struct EditorAction {
     //EditorAction和ActionKind分层设计是为了可扩展性,Basic部分的命令都是单个按键,但在Advanced部分中你会遇到多按键命令的情况,
     //这时候就会遇到按键的pending,比如dw,你可以先构造一个EditorAction存储kind_=Delete,等用户输入motion后令motion=w.
     //在Advanced部分中你很可能需要添加新的字段,比如std::optional<Count> count_{};
+
+    std::size_t count_{1};
+    bool has_count_{false};
 };
 
 
@@ -63,6 +66,9 @@ private:
     std::string prefix{""};
     bool pending{false};
     
+
+    std::size_t  count_{0};
+    bool has_count_{false};
 
 };
 

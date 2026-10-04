@@ -15,18 +15,18 @@ void Window::Resize(ScreenSize terminal_size) {
     viewport_.columns_ = terminal_size.columns_ > 0 ? terminal_size.columns_ : 1;
 }
 
-void Window::ApplyMotion(const Buffer& buffer, Motion motion) {
+void Window::ApplyMotion(const Buffer& buffer, Motion motion,size_t count , bool has_count) {
     //1. 根据方向调用对应的移动函数,Basic中每次移动一步,在Advanced中你可以改变count/添加别的case
     //2. 将行列限制在Normal模式的合法范围内(Buffer应始终至少有一行)
     //3. 调整视口,让移动后的光标可见(EnsureCursorVisible)
     if(motion == Motion::Left){
-        MoveLeft(buffer,1);
+        MoveLeft(buffer,count);
     }else if(motion == Motion::Right){
-        MoveRight(buffer,1);
+        MoveRight(buffer,count);
     }else if(motion == Motion::Up){
-        MoveUp(buffer,1);
+        MoveUp(buffer,count);
     }else if(motion == Motion::Down){
-        MoveDown(buffer,1);
+        MoveDown(buffer,count);
     }else if(motion == Motion::MoveToLineHead){
         MoveToLineHead(buffer);
     }else if(motion == Motion::MoveToLineEnd){
@@ -136,16 +136,22 @@ void Window::MoveLeft(const Buffer& buffer, std::size_t count) {
 
 void Window::MoveRight(const Buffer& buffer, std::size_t count) {
     //向右移动count个字符,最多到最后一个字符,并更新目标显示列
-    if(buffer.GetLineAt(cursor_.row_).size() == 0){
+    const std::string& s = buffer.GetLineAt(cursor_.row_);
+
+    if(s.empty()){
         cursor_.column_ = 0;
     }else{
-        if(cursor_.column_ + count < buffer.GetLineAt(cursor_.row_).size() - 1){
-            cursor_.column_ += count;
+        size_t last = s.size() -1;
+        size_t remaining = last - cursor_.column_;
+
+        if(count >= remaining){
+            cursor_.column_ = last;
         }else{
-            cursor_.column_ = buffer.GetLineAt(cursor_.row_).size() - 1;
+            cursor_.column_ += last; //防止溢出
         }
     }
-    desired_column_ =  BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+
+    desired_column_ = BufferColumnToRenderColumn(s,cursor_.column_);
 }
 
 
@@ -171,17 +177,23 @@ void Window::MoveUp(const Buffer& buffer, std::size_t count) {
 void Window::MoveDown(const Buffer& buffer, std::size_t count) {
     //先算目标行,最多到最后一行,再根据desired_screen_column_寻找目标字符
     //与向上移动一样,保留期望显示列
-    if(cursor_.row_ + count < buffer.GetLineCount() - 1){
-        cursor_.row_ += count;
+    size_t last_row = buffer.GetLineCount() - 1;
+    size_t remaining = last_row - cursor_.row_;
+
+    if(count >= remaining){
+        cursor_.row_ = last_row;
     }else{
-        cursor_.row_ = buffer.GetLineCount() - 1;
+        cursor_.row_ += last_row;
     }
+
     size_t column = RenderColumnToBufferColumn(buffer.GetLineAt(cursor_.row_),desired_column_);
 
-    if(buffer.GetLineAt(cursor_.row_).size() == 0){
+    std::string s = buffer.GetLineAt(cursor_.row_);
+
+    if(s.empty()){
         column = 0;
     }else{
-        column = column < buffer.GetLineAt(cursor_.row_).size() - 1? column: buffer.GetLineAt(cursor_.row_).size()-1;
+        column = std::min(column, s.size() - 1);
     }
 
     cursor_.column_ = column;

@@ -122,7 +122,7 @@ void Editor::Execute(const EditorAction& action) {
         }
     case ActionKind::Move:{
         //交给Window吧
-        window_.ApplyMotion(buffer_,*action.motion_);
+        window_.ApplyMotion(buffer_,*action.motion_,action.count_,action.has_count_);
         return;
         }
     case ActionKind::InsertBefore:{

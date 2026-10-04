@@ -1,4 +1,5 @@
 #include "Command.hpp"
+#include <limits>
 
 namespace sjtu {
 
@@ -8,6 +9,10 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
         // pending和prefix设置为none
         pending = false;
         prefix = "";
+
+        //需要清除状态
+        count_ = 0;
+        has_count_ = false;
         return {ActionKind::None};
     }
 
@@ -29,6 +34,10 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
         }else{
             pending = false;
             prefix = "";
+
+            // 清空状态
+            count_ = 0;
+            has_count_ = false;
             return {};
         }
     }
@@ -36,6 +45,28 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
 
     if (key.code_ == KeyCode::Character) {
         auto value = key.value_;
+
+        //处理数字
+        if( value >= '1' && value<= '9'){
+            size_t digit = static_cast<size_t>(value - '0');
+
+            if(count_ > (std::numeric_limits<size_t>::max() - digit) / 10){
+                count_ = std::numeric_limits<size_t>::max();
+            }else{
+                count_ = count_ * 10 + digit;
+            }
+        }
+
+        if( value == '0' && has_count_){
+            if(count_ > (std::numeric_limits<size_t>::max() - 0)/ 10){
+                count_ = std::numeric_limits<size_t>::max();
+            }else{
+                count_ *= 10;
+            }
+            return {};
+        }
+
+
         switch (value) {
         //你需要填写这里
         case 'h':
@@ -117,11 +148,41 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
 
 
 EditorAction NormalModeParser::GenerateMotion(Motion motion) {
-    return {ActionKind::Move, motion};
+    EditorAction action;
+    action.kind_ = ActionKind::Move;
+    action.motion_ = motion;
+
+    if(has_count_){
+        action.count_ = count_;
+        action.has_count_ = true;
+    } else{
+        action.count_ = 1;
+        action.has_count_ = false;
+    }
+
+    count_ = 0;
+    has_count_ = false;
+    //清空状态
+
+    return action;
 }
 
 EditorAction NormalModeParser::GenerateCommand(ActionKind kind) {
-    return {kind, std::nullopt};
+    EditorAction action;
+    action.kind_ = kind;
+
+    if(has_count_){
+        action.count_ = count_;
+        action.has_count_ = true;
+    }else{
+        action.count_ = 1;
+        action.has_count_ = false;
+    }
+
+    count_ = 0;
+    has_count_ = false;
+
+    return action;
 }
 
 } // namespace sjtu

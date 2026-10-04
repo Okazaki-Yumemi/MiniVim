@@ -17,7 +17,7 @@ class Window {
 public:
     void Resize(ScreenSize terminal_size);
 
-    void ApplyMotion(const Buffer& buffer, Motion motion);
+    void ApplyMotion(const Buffer& buffer, Motion motion,size_t count = 1 , bool has_count = false);
 
     void EnsureCursorVisible(const Buffer& buffer);
 
