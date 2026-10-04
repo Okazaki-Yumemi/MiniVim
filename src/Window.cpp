@@ -38,21 +38,80 @@ void Window::ApplyMotion(const Buffer& buffer, Motion motion,size_t count , bool
     }else if(motion == Motion:: MoveToFirstRowgg){
         MoveToFirstRowgg(buffer,count , has_count);
     }else if(motion == Motion:: Move_w){
-        OpWw(buffer,true);
+        for(size_t i = 0 ; i < count ; i++){
+            Position before = cursor_;
+            OpWw(buffer,true);
+
+            if(cursor_.row_ == before.row_ && cursor_.column_ == before.column_){
+                break;
+            }
+        }
     }else if(motion == Motion:: Move_W){
-        OpWw(buffer,false);
+        for(size_t i = 0 ; i < count ; i++){
+            Position before = cursor_;
+            OpWw(buffer,false);
+
+            if(cursor_.row_ == before.row_ && cursor_.column_ == before.column_){
+                break;
+            }
+        }
     }else if(motion == Motion:: Move_e){
-        OpEe(buffer,true);
+        for(size_t i = 0 ; i < count ; i++){
+            Position before = cursor_;
+            OpEe(buffer,true);
+
+            if(cursor_.row_ == before.row_ && cursor_.column_ == before.column_){
+                break;
+            }
+        }
+        
     }else if(motion == Motion:: Move_E){
-        OpEe(buffer,false);
+        for(size_t i = 0 ; i < count ; i++){
+            Position before = cursor_;
+            OpEe(buffer,false);
+
+            if(cursor_.row_ == before.row_ && cursor_.column_ == before.column_){
+                break;
+            }
+        }
     }else if(motion == Motion :: Move_B){
-        OpBb(buffer,false);
+        for(size_t i = 0 ; i < count ; i++){
+            Position before = cursor_;
+            OpBb(buffer,false);
+
+            if(cursor_.row_ == before.row_ && cursor_.column_ == before.column_){
+                break;
+            }
+        }
+        
     }else if(motion == Motion :: Move_b){
-        OpBb(buffer,true);
+        for(size_t i = 0 ; i < count ; i++){
+            Position before = cursor_;
+            OpBb(buffer,true);
+
+            if(cursor_.row_ == before.row_ && cursor_.column_ == before.column_){
+                break;
+            }
+        }
     }else if(motion == Motion :: Move_gE){
-        OpgegE(buffer,false);
+        for(size_t i = 0 ; i < count ; i++){
+            Position before = cursor_;
+            OpgegE(buffer,false);
+
+            if(cursor_.row_ == before.row_ && cursor_.column_ == before.column_){
+                break;
+            }
+        }
+        
     }else if(motion == Motion :: Move_ge){
-        OpgegE(buffer,true);
+        for(size_t i = 0 ; i < count ; i++){
+            Position before = cursor_;
+            OpgegE(buffer,true);
+
+            if(cursor_.row_ == before.row_ && cursor_.column_ == before.column_){
+                break;
+            }
+        }
     }
 
     cursor_.row_ = cursor_.row_ > buffer.GetLineCount() - 1? buffer.GetLineCount() - 1: cursor_.row_;
