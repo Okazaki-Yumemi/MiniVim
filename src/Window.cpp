@@ -203,8 +203,10 @@ void Window::MoveLeft(const Buffer& buffer, std::size_t count) {
         cursor_.column_ = 0;
     }
 
-    desired_column_ =  BufferColumnToNormalCursorColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+    
     if(cursor_.column_ != before.column_){
+        //失败水平不修改curswant
+        desired_column_ =  BufferColumnToNormalCursorColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
         desired_eol_ = false;
     }
 }
@@ -227,9 +229,11 @@ void Window::MoveRight(const Buffer& buffer, std::size_t count) {
         }
     }
 
-    desired_column_ = BufferColumnToNormalCursorColumn(s,cursor_.column_);
+    
     if(cursor_.column_ != before.column_){
         desired_eol_ = false;
+        //debug，失败的水平移动不修改curswant
+        desired_column_ = BufferColumnToNormalCursorColumn(s,cursor_.column_);
     }
 }
 
