@@ -41,6 +41,10 @@ inline size_t RenderColumnToBufferColumn(std::string_view line, size_t render_co
     return line.size();
 }
 
+//展示布局
+//Insert 光标位置
+//字符起始位置计算
+
 inline size_t BufferColumnToRenderColumn(std::string_view line, size_t buffer_column) {
     //把字符下标转换为该字符在整行展开后的起始显示列
     //调用方须保证buffer_column在[0, line.size()]内
@@ -52,6 +56,20 @@ inline size_t BufferColumnToRenderColumn(std::string_view line, size_t buffer_co
 
     return column;
 }
+
+
+// Normal cursor / curswant 在哪里
+//Normal 模式下 desired_column_
+//Normal 模式 cursor 的视觉位置
+inline size_t BufferColumnToNormalCursorColumn(std::string_view line, size_t buffer_column){
+    size_t start = BufferColumnToRenderColumn(line,buffer_column);
+
+    if(buffer_column < line.size() && line[buffer_column] == '\t' ){
+        return NextScreenColumn(start , '\t') - 1;
+    }
+    return start;
+}
+
 
 } 
 

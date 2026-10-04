@@ -174,7 +174,12 @@ void Window::SetCursor(const Buffer& buffer, Position position, bool allow_line_
         cursor_.column_ = cursor_.column_ > buffer.GetLineAt(cursor_.row_).size() - 1 + extra? buffer.GetLineAt(cursor_.row_).size() - 1 + extra:cursor_.column_;
     }
 
-    desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+    if(allow_line_end){
+        desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+    }else{
+        desired_column_ = BufferColumnToNormalCursorColumn(buffer.GetLineAt(cursor_.row_), cursor_.column_);
+    }
+    
 
 
     EnsureCursorVisible(buffer);
@@ -190,7 +195,7 @@ void Window::MoveLeft(const Buffer& buffer, std::size_t count) {
         cursor_.column_ = 0;
     }
 
-    desired_column_ =  BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+    desired_column_ =  BufferColumnToNormalCursorColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
 }
 
 void Window::MoveRight(const Buffer& buffer, std::size_t count) {
@@ -210,7 +215,7 @@ void Window::MoveRight(const Buffer& buffer, std::size_t count) {
         }
     }
 
-    desired_column_ = BufferColumnToRenderColumn(s,cursor_.column_);
+    desired_column_ = BufferColumnToNormalCursorColumn(s,cursor_.column_);
 }
 
 
@@ -262,7 +267,7 @@ void Window::MoveToLineHead(const Buffer& buffer){
     //移动到行首
     // 要修改期望显示列
     cursor_.column_ = 0;
-    desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_), cursor_.column_);
+    desired_column_ = BufferColumnToNormalCursorColumn(buffer.GetLineAt(cursor_.row_), cursor_.column_);
 }
 
 void Window::MoveToLineEnd(const Buffer& buffer){
@@ -274,7 +279,7 @@ void Window::MoveToLineEnd(const Buffer& buffer){
     }else{
         cursor_.column_ = buffer.GetLineAt(cursor_.row_).size() - 1;
     }
-    desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+    desired_column_ = BufferColumnToNormalCursorColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
 }
 
 void Window::MoveToFirstNoneEmpty(const Buffer& buffer){
@@ -284,7 +289,7 @@ void Window::MoveToFirstNoneEmpty(const Buffer& buffer){
 
     if(s.size() == 0){
         cursor_.column_ = 0;
-        desired_column_ = BufferColumnToRenderColumn(s,0);
+        desired_column_ = BufferColumnToNormalCursorColumn(s,0);
         return;
     }
 
@@ -372,7 +377,7 @@ std::string Window::Classify(char ch , bool mode){
 
 void Window::OpWw(const Buffer& buffer,bool mode){
     cursor_ = NextStart(buffer,mode);
-    desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+    desired_column_ = BufferColumnToNormalCursorColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
 }
 
 
@@ -546,7 +551,7 @@ Position Window::NextEnd(const Buffer& Buffer , bool mode){
 
 void Window::OpEe(const Buffer& buffer,bool mode){
     cursor_ = NextEnd(buffer , mode);
-    desired_column_ = BufferColumnToRenderColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
+    desired_column_ = BufferColumnToNormalCursorColumn(buffer.GetLineAt(cursor_.row_),cursor_.column_);
 }
 
 
@@ -596,7 +601,7 @@ Position Window::PrevStart(const Buffer& Buffer , bool mode){
 void Window::OpBb(const Buffer& Buffer, bool mode){
     cursor_ = PrevStart(Buffer,  mode);
 
-    desired_column_ = BufferColumnToRenderColumn(Buffer.GetLineAt(cursor_.row_), cursor_.column_);
+    desired_column_ = BufferColumnToNormalCursorColumn(Buffer.GetLineAt(cursor_.row_), cursor_.column_);
 }
 
 
@@ -667,7 +672,7 @@ Position Window::PrevEnd(const Buffer& Buffer, bool mode){
 void Window::OpgegE(const Buffer& Buffer, bool mode){
     cursor_ = PrevEnd(Buffer,  mode);
 
-    desired_column_ = BufferColumnToRenderColumn(Buffer.GetLineAt(cursor_.row_), cursor_.column_);
+    desired_column_ = BufferColumnToNormalCursorColumn(Buffer.GetLineAt(cursor_.row_), cursor_.column_);
 }
 
 

@@ -95,11 +95,12 @@ std::string Renderer::Render(const Buffer& buffer, const Window& window, const R
 
         cursor_row = cursor.row_ - viewport.top_ + 1;
 
-        size_t render_column =
-            BufferColumnToRenderColumn(
-                buffer.GetLineAt(cursor.row_),
-                cursor.column_
-            );
+        size_t render_column;
+        if(state.mode_ ==  Mode::Normal){
+            render_column = BufferColumnToNormalCursorColumn(buffer.GetLineAt(cursor.row_),cursor.column_);
+        }else{
+            render_column = BufferColumnToRenderColumn(buffer.GetLineAt(cursor.row_),cursor.column_);
+        }
 
         cursor_column = render_column - viewport.left_ + 1;
     }
