@@ -84,6 +84,10 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
             return GenerateCommand(ActionKind::OpenAbove);
         case 'o':
             return GenerateCommand(ActionKind::OpenBelow);
+        case 'x':
+            return GenerateCommand(ActionKind::DeleteCurrChar);
+        case 'X':
+            return GenerateCommand(ActionKind::DeleteBeforeChar);
         
         default:
             break;

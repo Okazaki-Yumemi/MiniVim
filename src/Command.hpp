@@ -27,6 +27,9 @@ enum class ActionKind {
     AppendLineEnd,
     OpenBelow,
     OpenAbove,
+
+    DeleteCurrChar,
+    DeleteBeforeChar,
 };
 
 //EditorAction是在NormalMode下我们的Editor真正收到的指令,在Editor中会根据传入的Action的不同让各模块做出对应的处理

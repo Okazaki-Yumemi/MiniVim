@@ -170,6 +170,15 @@ void Editor::Execute(const EditorAction& action) {
         OpenAbove();
         return;
     }
+
+    case ActionKind::DeleteBeforeChar:{
+        DeleteBeforeChar();
+        return;
+    }
+    case ActionKind::DeleteCurrChar:{
+        DeleteCurrChar();
+        return;
+    }
     }
 
 }
@@ -308,6 +317,41 @@ void Editor::OpenAbove(){
     EnterInsert(cursor);
     return;
 }
+
+void Editor::DeleteCurrChar(){
+    //照搬Del的逻辑。。
+    Position cursor = window_.GetCursor();
+
+    std::string s = buffer_.GetLineAt(cursor.row_);
+
+    if(cursor.column_ == s.size()){
+        if(cursor.row_ != buffer_.GetLineCount() -1){
+            buffer_.JoinLine(cursor.row_);
+        }
+    }else{
+        buffer_.EraseCharacter(cursor.row_, cursor.column_);
+    }
+    window_.SetCursor(buffer_, cursor, true);
+    return;
+}
+
+void Editor::DeleteBeforeChar(){
+    //照搬Backspace逻辑
+    Position cursor = window_.GetCursor();
+    if(cursor.column_ == 0){
+        if(cursor.row_ != 0){
+            cursor.column_ = buffer_.GetLineAt(cursor.row_ -1 ).size();
+            buffer_.JoinLine(cursor.row_ - 1);
+            cursor.row_ --;
+        }
+    }else{
+        buffer_.EraseCharacter(cursor.row_,cursor.column_ - 1);
+        cursor.column_ --;
+    }
+    window_.SetCursor(buffer_,cursor,true);
+    return;
+}
+
 
 
 void Editor::LeaveInsert() {
