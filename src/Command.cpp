@@ -88,6 +88,8 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
             return GenerateCommand(ActionKind::DeleteCurrChar);
         case 'X':
             return GenerateCommand(ActionKind::DeleteBeforeChar);
+        case '~':
+            return GenerateCommand(ActionKind::ChangeCase);
         
         default:
             break;

@@ -51,6 +51,8 @@ private:
     void DeleteCurrChar();
     void DeleteBeforeChar();
 
+    void ChangeCase();
+
     void HandleInsert(KeyEvent key);
 
     //ProcessKey的下属函数之一,Editor在CommandMode下对于KeyEvent的处理逻辑

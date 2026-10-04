@@ -179,6 +179,11 @@ void Editor::Execute(const EditorAction& action) {
         DeleteCurrChar();
         return;
     }
+
+    case ActionKind::ChangeCase:{
+        ChangeCase();
+        return;
+    }
     }
 
 }
@@ -324,14 +329,12 @@ void Editor::DeleteCurrChar(){
 
     std::string s = buffer_.GetLineAt(cursor.row_);
 
-    if(cursor.column_ == s.size()){
-        if(cursor.row_ != buffer_.GetLineCount() -1){
-            buffer_.JoinLine(cursor.row_);
-        }
-    }else{
-        buffer_.EraseCharacter(cursor.row_, cursor.column_);
+    if(s.size() == 0){
+        return; // Normal mode下 cursor不会跑到 size位置，所以如果是空行直接退
     }
-    window_.SetCursor(buffer_, cursor, true);
+    buffer_.EraseCharacter(cursor.row_,cursor.column_);
+
+    window_.SetCursor(buffer_, cursor, false);
     return;
 }
 
@@ -339,20 +342,46 @@ void Editor::DeleteBeforeChar(){
     //照搬Backspace逻辑
     Position cursor = window_.GetCursor();
     if(cursor.column_ == 0){
-        if(cursor.row_ != 0){
-            cursor.column_ = buffer_.GetLineAt(cursor.row_ -1 ).size();
-            buffer_.JoinLine(cursor.row_ - 1);
-            cursor.row_ --;
-        }
+        return;
     }else{
         buffer_.EraseCharacter(cursor.row_,cursor.column_ - 1);
         cursor.column_ --;
     }
-    window_.SetCursor(buffer_,cursor,true);
+    window_.SetCursor(buffer_,cursor,false);
     return;
 }
 
+void Editor::ChangeCase(){
+    //把当前字符的大小写改变，change Case
+    Position cursor = window_.GetCursor();
 
+    std::string& s = buffer_.GetLineAt_Changeable(cursor.row_);
+
+    //normal mode下cursor不会在行尾
+    if(s.size() == 0){
+        return;
+        //啥都不干
+    }
+
+    if(cursor.column_ == s.size() -1){
+        //最后一个
+        if(s[cursor.column_] >= 'A' && s[cursor.column_] <='Z'){
+            s[cursor.column_] = s[cursor.column_] - 'A' + 'a';
+        }else if(s[cursor.column_] >= 'a' && s[cursor.column_] <= 'z'){
+            s[cursor.column_] = s[cursor.column_] - 'a' + 'A';
+        }
+    }else{
+        //不是最后一个
+        if(s[cursor.column_] >= 'A' && s[cursor.column_] <='Z'){
+            s[cursor.column_] = s[cursor.column_] - 'A' + 'a';
+        }else if(s[cursor.column_] >= 'a' && s[cursor.column_] <= 'z'){
+            s[cursor.column_] = s[cursor.column_] - 'a' + 'A';
+        }
+        cursor.column_ ++; //右移
+    }
+
+    window_.SetCursor(buffer_,cursor,false);
+}
 
 void Editor::LeaveInsert() {
     //从插入位置回到Normal模式的字符位置:不在行首时先左移一列,再限制光标范围

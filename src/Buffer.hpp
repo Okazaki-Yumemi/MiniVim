@@ -19,6 +19,7 @@ public:
 
     std::size_t GetLineCount() const;
     const std::string& GetLineAt(std::size_t row) const;
+    std::string& GetLineAt_Changeable(std::size_t row);
     std::string GetDisplayName() const;
     bool IsModified() const ;
 

@@ -41,6 +41,10 @@ const std::string& Buffer::GetLineAt(std::size_t row) const {
     return lines_[row];
 }
 
+std::string& Buffer::GetLineAt_Changeable(std::size_t row){
+    return lines_[row];
+}
+
 
 std::string Buffer::GetDisplayName() const {
     //返回文件名,若是新文件,返回"[No Name]"
