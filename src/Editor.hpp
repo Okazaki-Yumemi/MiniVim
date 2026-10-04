@@ -42,6 +42,8 @@ private:
     //FAQ:为啥InsertMode和CommandMode的处理直接属于Editor.hpp/cpp,而NormalMode则分出去一个单独的文件(Command.hpp/cpp)?
     //NormalMode的命令解析部分比较复杂所以我们单独解析,而这两部分逻辑需要Editor直接统筹全局其他模块且比较简明
     void EnterInsert(Position position);
+    void EnterFirstNoneEmptyInsert();
+    void EnterLastWordInsert();
     void LeaveInsert();
     void HandleInsert(KeyEvent key);
 

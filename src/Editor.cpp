@@ -153,7 +153,17 @@ void Editor::Execute(const EditorAction& action) {
         mode_ = Mode::CommandLine;
         return;
         }
+    case ActionKind::InsertFirstNoneBlank:{
+        EnterFirstNoneEmptyInsert();
+        return;
+        }
+    
+    case ActionKind::AppendLineEnd:{
+        EnterLastWordInsert();
+        return;
     }
+    }
+
 }
 
 //Insert模式下Editor对于KeyEvent的处理.
@@ -210,6 +220,29 @@ void Editor::EnterInsert(Position position) {
     window_.SetCursor(buffer_,position,true);
     return;
 }
+
+void Editor::EnterFirstNoneEmptyInsert(){
+    //切换到First Insert 模式
+    window_.ApplyMotion(buffer_,Motion::MoveToFirstNoneEmpty);
+    EnterInsert(window_.GetCursor());
+    return;
+}
+
+void Editor::EnterLastWordInsert(){
+    //Last Insert
+    window_.ApplyMotion(buffer_,Motion::MoveToLineEnd);
+
+    Position cursor = window_.GetCursor();
+    //在最后一个字符之后
+    if(buffer_.GetLineAt(cursor.row_).size() != 0){
+        cursor.column_ ++;
+    }
+
+    EnterInsert(cursor);
+    return;
+}
+
+
 
 void Editor::LeaveInsert() {
     //从插入位置回到Normal模式的字符位置:不在行首时先左移一列,再限制光标范围

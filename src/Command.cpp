@@ -76,6 +76,10 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
             return GenerateCommand(ActionKind::InsertAfter);
         case ':':
             return GenerateCommand(ActionKind::EnterCommandLine);
+        case 'I':
+            return GenerateCommand(ActionKind::InsertFirstNoneBlank);
+        case 'A':
+            return GenerateCommand(ActionKind::AppendLineEnd);
 
         
         default:
