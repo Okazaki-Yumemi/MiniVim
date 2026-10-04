@@ -34,8 +34,8 @@ private:
     void MoveToLineHead(const Buffer& buffer);
     void MoveToLineEnd(const Buffer& buffer);
     void MoveToFirstNoneEmpty(const Buffer& buffer);
-    void MoveToLastRowG(const Buffer& buffer);
-    void MoveToFirstRowgg(const Buffer& buffer);
+    void MoveToLastRowG(const Buffer& buffer, size_t count = 1 , bool has_count = false);
+    void MoveToFirstRowgg(const Buffer& buffer,size_t count=1, bool has_count= false);
     std::string Classify(char ch, bool mode);
     Position NextStart(const Buffer& Buffer,bool mode);
     void OpWw(const Buffer& buffer,bool mode);

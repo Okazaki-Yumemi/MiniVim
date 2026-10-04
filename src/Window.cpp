@@ -34,9 +34,9 @@ void Window::ApplyMotion(const Buffer& buffer, Motion motion,size_t count , bool
     }else if (motion == Motion::MoveToFirstNoneEmpty){
         MoveToFirstNoneEmpty(buffer);
     }else if (motion == Motion::MoveToLastRowG){
-        MoveToLastRowG(buffer);
+        MoveToLastRowG(buffer,count,has_count);
     }else if(motion == Motion:: MoveToFirstRowgg){
-        MoveToFirstRowgg(buffer);
+        MoveToFirstRowgg(buffer,count , has_count);
     }else if(motion == Motion:: Move_w){
         OpWw(buffer,true);
     }else if(motion == Motion:: Move_W){
@@ -147,7 +147,7 @@ void Window::MoveRight(const Buffer& buffer, std::size_t count) {
         if(count >= remaining){
             cursor_.column_ = last;
         }else{
-            cursor_.column_ += last; //防止溢出
+            cursor_.column_ += count; //防止溢出
         }
     }
 
@@ -183,7 +183,7 @@ void Window::MoveDown(const Buffer& buffer, std::size_t count) {
     if(count >= remaining){
         cursor_.row_ = last_row;
     }else{
-        cursor_.row_ += last_row;
+        cursor_.row_ += count;
     }
 
     size_t column = RenderColumnToBufferColumn(buffer.GetLineAt(cursor_.row_),desired_column_);
@@ -250,21 +250,43 @@ void Window::MoveToFirstNoneEmpty(const Buffer& buffer){
     desired_column_ = BufferColumnToRenderColumn(s,cursor_.column_);
 }
 
-void Window::MoveToLastRowG(const Buffer& buffer){
+void Window::MoveToLastRowG(const Buffer& buffer,size_t count , bool has_count){
 
     //特判 /空文件
     if(buffer.GetLineCount() == 0){
         cursor_.row_ = 0;
     }else{
-        cursor_.row_ = buffer.GetLineCount() - 1;
+        //没有count
+        if(!has_count){
+            cursor_.row_ = buffer.GetLineCount() -1;
+        }else{
+            if(count > buffer.GetLineCount()){
+                cursor_.row_ = buffer.GetLineCount() -1;
+            }else{
+                cursor_.row_ = count - 1;
+            }
+        }
     }
 
     //直接用
     MoveToFirstNoneEmpty(buffer);
 }
 
-void Window::MoveToFirstRowgg(const Buffer& buffer){
-    cursor_.row_ = 0;
+void Window::MoveToFirstRowgg(const Buffer& buffer,size_t count , bool has_count){
+    if(buffer.GetLineCount() == 0){
+        cursor_.row_ = 0;
+    }else{
+        //没有count
+        if(!has_count){
+            cursor_.row_ = 0;
+        }else{
+            if(count > buffer.GetLineCount()){
+                cursor_.row_ = buffer.GetLineCount() -1;
+            }else{
+                cursor_.row_ = count - 1;
+            }
+        }
+    }
 
     MoveToFirstNoneEmpty(buffer);
 }

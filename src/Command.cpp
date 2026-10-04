@@ -55,6 +55,9 @@ EditorAction NormalModeParser::Feed(KeyEvent key) {
             }else{
                 count_ = count_ * 10 + digit;
             }
+
+            has_count_ = true;
+            return {};
         }
 
         if( value == '0' && has_count_){
